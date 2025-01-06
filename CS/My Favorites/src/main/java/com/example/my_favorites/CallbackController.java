@@ -1,5 +1,7 @@
 package com.example.my_favorites;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import org.apache.catalina.connector.Request;
@@ -53,7 +55,11 @@ public class CallbackController {
         authCode = code;
 
         getUserSongs();
-        return "redirect:/success?code=" + code;
+        return "redirect:/page2";
+    }
+    @GetMapping("/page2")
+    public String page2() {
+        return "page2"; // Renders page2.html
     }
 protected String exchangeForRefreshToken(){
     RestTemplate restTemplate = new RestTemplate();
@@ -91,12 +97,20 @@ protected String exchangeForRefreshToken(){
            String currToken = exchangeForRefreshToken();
             headers.set("Authorization", "Bearer " + currToken);
             headers.setContentType(MediaType.APPLICATION_JSON);
-            System.out.println(headers);
             HttpEntity<String> entity = new HttpEntity<String>(headers);
+            String[] songs = new String[5];
             ResponseEntity<String> response = restTemplate.exchange("https://api.spotify.com/v1/me/top/tracks?limit=5", HttpMethod.GET, entity, String.class);
+            JSONObject jsonObject = new JSONObject(response.getBody());
+            JSONArray items = jsonObject.getJSONArray("items");
 
-            if(response.getStatusCode() == HttpStatus.OK){
-                System.out.println("User albums: " + response.getBody());
+        if(response.getStatusCode() == HttpStatus.OK){
+                for(int i = 0; i< items.length(); i++){
+                    JSONObject item = items.getJSONObject(i);
+                    JSONObject album = item.getJSONObject("album");
+
+                    String currSong = album.getString("name");
+                    System.out.println(currSong);
+                }
             }else{
                 System.out.println("Error: " + response.getStatusCode());
             }

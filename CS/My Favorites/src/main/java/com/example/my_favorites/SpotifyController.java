@@ -7,8 +7,11 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.servlet.ModelAndView;
 
 import java.io.IOException;
 import java.net.URLEncoder;
@@ -19,13 +22,10 @@ import java.util.Map;
 @Controller
 public class SpotifyController {
     private static final String clientId = System.getenv("SPOTIFY_CLIENT_ID");
-    private static final String redirectUri = "http://localhost:8080/callback"; // Your callback URL
+    private static final String redirectUri = "http://localhost:8080/callback";
     private static final String stateKey = generateRandomString(16);
-    private static final String scope = "user-read-private user-read-email user-top-read"; // Adjust scopes as needed
+    private static final String scope = "user-read-private user-read-email user-top-read";
 
-    /**
-     * Redirects user to Spotify authorization endpoint.
-     */
     @GetMapping("/login")
     public void login(HttpServletResponse response) throws IOException, IOException {
         String state = generateRandomString(16); // Generate a random state
@@ -38,6 +38,12 @@ public class SpotifyController {
               "&state=" + URLEncoder.encode(state, StandardCharsets.UTF_8);
 
         response.sendRedirect(url);
+    }
+    @RequestMapping(method = RequestMethod.GET, value = "/")
+    public ModelAndView welcome() {
+        ModelAndView modelAndView = new ModelAndView();
+        modelAndView.setViewName("index.html");
+        return modelAndView;
     }
 
     private static String generateRandomString(int length) {
