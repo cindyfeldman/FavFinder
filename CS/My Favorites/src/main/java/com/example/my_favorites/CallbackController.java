@@ -8,13 +8,14 @@ import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
 import org.springframework.http.*;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.servlet.ModelAndView;
 
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Map;
 
 
@@ -26,15 +27,14 @@ public class CallbackController {
     private static final String url = "https://api.spotify.com/v1/users/me";
     private static final String clientId =System.getenv("SPOTIFY_CLIENT_ID");
     private static final String clientSecret  = System.getenv("SPOTIFY_CLIENT_SECRET");
+    public static ArrayList<String> songs = new ArrayList<>();
     @GetMapping("/callback")
     public String callback(
             @RequestParam(value = "code", required = false) String code,
             @RequestParam(value = "state", required = false) String state,
             @RequestParam(value = "error", required = false) String error,
             HttpServletRequest request) {
-
         if (error != null) {
-
             return "redirect:/error?error=" + error;
         }
 
@@ -54,12 +54,8 @@ public class CallbackController {
         }
         authCode = code;
 
-        getUserSongs();
-        return "redirect:/page2";
-    }
-    @GetMapping("/page2")
-    public String page2() {
-        return "page2"; // Renders page2.html
+        songs = getUserSongs();
+        return "index";
     }
 protected String exchangeForRefreshToken(){
     RestTemplate restTemplate = new RestTemplate();
@@ -91,29 +87,32 @@ protected String exchangeForRefreshToken(){
         return refreshToken;
 }
 
-    public void getUserSongs(){
+
+    public ArrayList<String> getUserSongs(){
             RestTemplate restTemplate = new RestTemplate();
             HttpHeaders headers = new HttpHeaders();
-           String currToken = exchangeForRefreshToken();
+            String currToken = exchangeForRefreshToken();
             headers.set("Authorization", "Bearer " + currToken);
             headers.setContentType(MediaType.APPLICATION_JSON);
-            HttpEntity<String> entity = new HttpEntity<String>(headers);
-            String[] songs = new String[5];
+
+            HttpEntity<String> entity = new HttpEntity<>(headers);
             ResponseEntity<String> response = restTemplate.exchange("https://api.spotify.com/v1/me/top/tracks?limit=5", HttpMethod.GET, entity, String.class);
+
             JSONObject jsonObject = new JSONObject(response.getBody());
             JSONArray items = jsonObject.getJSONArray("items");
 
-        if(response.getStatusCode() == HttpStatus.OK){
+            if(response.getStatusCode() == HttpStatus.OK){
                 for(int i = 0; i< items.length(); i++){
                     JSONObject item = items.getJSONObject(i);
                     JSONObject album = item.getJSONObject("album");
 
                     String currSong = album.getString("name");
-                    System.out.println(currSong);
+                    songs.add(currSong);
                 }
             }else{
                 System.out.println("Error: " + response.getStatusCode());
             }
-
+    return songs;
     }
+
 }

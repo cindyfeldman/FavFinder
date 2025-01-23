@@ -18,6 +18,8 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
+import static com.example.my_favorites.CallbackController.songs;
+
 
 @Controller
 public class SpotifyController {

@@ -3,14 +3,19 @@
 <head>
   <link rel="stylesheet" type="text/css" href="/css/style.css">
   <title>Fav Finder</title>
-  <script src="/main.js"></script>
 </head>
 <body>
 Fav Finder
 </body>
+
 <h2>
   <button type="button" id="login-button" onclick="signin()">Sign in</button>
 </h2>
+<script >
+  function signin() {
+    var button = document.getElementById("login-button");
+    button.innerHTML = '<p> Authorized</p>'
+  }
 
-
+</script>
 </html>

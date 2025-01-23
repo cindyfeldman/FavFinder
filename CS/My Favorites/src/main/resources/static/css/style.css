@@ -3,3 +3,6 @@ body {
     font-size: 60px;
     text-align: center
 }
+h3 {
+    visibility: hidden
+}
