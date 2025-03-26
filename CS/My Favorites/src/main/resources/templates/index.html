@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
   <link rel="stylesheet" type="text/css" href="/css/style.css">
   <title>Fav Finder</title>
@@ -7,15 +7,13 @@
 <body>
 Fav Finder
 </body>
-
 <h2>
-  <button type="button" id="login-button" onclick="signin()">Sign in</button>
+  <button id="login-button" onclick="window.location.href='http://localhost:8080/login'">Login with Spotify</button>
 </h2>
-<script >
-  function signin() {
-    var button = document.getElementById("login-button");
-    button.innerHTML = '<p> Authorized</p>'
-  }
 
-</script>
+
+
+
+
+
 </html>

@@ -1,0 +1,53 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>User Favorites</title>
+</head>
+<body>
+    <div class="container">
+        <h1>Top 5 Songs</h1>
+        <ul id="songs-list">
+
+        </ul>
+    </div>
+</body>
+<script>
+    async function getToken(){
+        const response = await fetch('/access_token');
+        const data = await response.json();
+
+        return data.access_token;
+    }
+    async function fetchTopTracks(access_token) {
+        const response = await fetch('/top_tracks', {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${access_token}`
+            }
+        });
+        const data = await response.json();
+        return data.items || [];
+    }
+
+    async function displayTracks() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const code = urlParams.get('code');
+
+        if(code){
+            const token = await getToken(code);
+            const topTracks = await fetchTopTracks(token);
+            let list = document.getElementById('songs-list');
+            console.log(topTracks.length)
+            for(let i = 0; i< topTracks.length; i++)
+            {
+                let object = topTracks[i];
+                var li = document.createElement("li");
+                li.appendChild(document.createTextNode(object.name));
+                list.appendChild(li);
+            }
+        }else
+            console.log("ERROR: cant find the access code");
+    }
+displayTracks();
+</script>
+</html>
